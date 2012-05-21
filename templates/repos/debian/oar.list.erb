@@ -1,0 +1,6 @@
+# INSTALLED BY PUPPET
+# Module:   oar
+# Template: repos/debian/oar.list
+
+deb http://oar-ftp.imag.fr/oar/<%= scope.lookupvar('version') %>/debian/ <%= scope.lookupvar('lsbdistcodename') %> main
+
