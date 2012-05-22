@@ -3,8 +3,6 @@
 
 Vagrant::Config.run do |config|
 
-  #facters = { "modulepath" => "../module-0" }
-
   config.vm.define :server do |server|
     server.vm.box = "oar"
     server.vm.box_url = "http://localhost/~pmorillon/vagrant_boxes/debian-squeeze-x64_puppet-2.6.9.box"
