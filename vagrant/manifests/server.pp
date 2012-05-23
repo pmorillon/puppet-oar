@@ -1,6 +1,7 @@
 # OAR server installation with puppet and vagrant
 
 $oar_version = "2.5"
+$oar_home    = "/var/lib/oar"
 $files_path  = "/tmp/vagrant-puppet/manifests/files"
 
 class {
@@ -20,6 +21,26 @@ file {
     source  => "${files_path}/conf/server/oar.conf",
     require => Package["oar-server"],
     notify  => Service["oar-server"];
+  "/etc/hosts":
+    ensure  => file,
+    mode    => 644, owner => root, group => root,
+    source  => "${files_path}/conf/server/hosts",
+    require => Package["oar-server"];
+  "${oar_home}/.ssh/authorized_keys":
+    ensure => file,
+    mode => 644, owner => oar, group => oar,
+    source => "${files_path}/keys/server/authorized_keys",
+    require => Package["oar-server"];
+  "${oar_home}/.ssh/id_rsa":
+    ensure => file,
+    mode => 600, owner => oar, group => oar,
+    source => "${files_path}/keys/server/id_rsa",
+    require => Package["oar-server"];
+  "${oar_home}/.ssh/id_rsa.pub":
+    ensure => file,
+    mode => 644, owner => oar, group => oar,
+    source => "${files_path}/keys/server/id_rsa.pub",
+    require => Package["oar-server"];
 }
 
 # Class:: vagrant::oar::mysql
