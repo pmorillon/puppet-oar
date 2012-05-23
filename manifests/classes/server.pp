@@ -5,11 +5,15 @@
 # Class:: oar::server ($version = "2.5") inherits oar
 #
 #
-class oar::server ($version = "2.5") {
+class oar::server ($version = "2.5", $db = "mysql") {
 
   # Allow to install frontend and server on the same machine
   if !defined(Class["oar"]) {
-    class { "oar": version => $version; }
+    class {
+      "oar":
+        version => $version,
+        db      => $db;
+    }
   }
 
   case $operatingsystem {
@@ -42,6 +46,24 @@ class oar::server::base inherits oar {
     ["oar-server", "oar-admin"]:
       ensure  => installed,
       require => Oar::Configure_repo["oar"];
+  }
+
+  package {
+    "db-server":
+      name    => $oar::db ? {
+        "mysql" => "oar-server-mysql",
+        "pgsql" => "oar-server-pgsql",
+      },
+      ensure  => installed,
+      require => Oar::Configure_repo["oar"];
+  }
+
+   service {
+    "oar-server":
+      ensure => running,
+      pattern => "Almighty",
+      enable => true,
+      require => Package["oar-server"];
   }
 
 } # Class:: oar::server::base inherits oar
