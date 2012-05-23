@@ -17,7 +17,7 @@ file {
   "/etc/oar/oar.conf":
     ensure  => file,
     mode    => 600, owner => oar, group => root,
-    source  => "${files_path}/oar.conf",
+    source  => "${files_path}/conf/server/oar.conf",
     require => Package["oar-server"],
     notify  => Service["oar-server"];
 }
