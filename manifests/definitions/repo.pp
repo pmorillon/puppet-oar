@@ -14,19 +14,21 @@ define oar::configure_repo($version) {
           ensure  => file,
           mode    => 644, owner => root, group => root,
           content => template("oar/repos/debian/oar.list.erb"),
-          notify  => Exec["APT sources update", "Add APT key"];
+          notify  => Exec["OAR APT sources update"],
+          require => Exec["Add APT key"];
       }
 
       exec {
-        "APT sources update":
+        "OAR APT sources update":
           path        => "/usr/bin:/usr/sbin:/bin",
           command     => "apt-get update",
-          refreshonly => true,
-          require     => Exec["Add APT key"];
+          refreshonly => true;
         "Add APT key":
           path        => "/usr/bin:/usr/sbin:/bin",
-          command     => "curl http://oar-ftp.imag.fr/oar/oarmaster.asc | sudo apt-key add -",
-          refreshonly => true;
+          command     => "wget http://oar-ftp.imag.fr/oar/oarmaster.asc && sudo apt-key add /tmp/oarmaster.asc",
+          unless      => "apt-key list | grep oar",
+          cwd         => "/tmp",
+          notify      => Exec["OAR APT sources update"];
       }
     }
     centos: {

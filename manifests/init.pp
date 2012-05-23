@@ -10,31 +10,16 @@ import "classes/*.pp"
 #
 class oar ($version = "2.5") {
 
-    include "oar::dependencies"
-
     oar::configure_repo {
       "oar":
-        version => $version,
-        require => Package["curl"];
+        version => $version;
     }
 
     package {
       ["oar-common", "oar-doc"]:
-        ensure  => installed;
+        ensure  => installed,
+        require => Oar::Configure_repo["oar"];
     }
 
 } # Class:: oar ($version = "2.5")
-
-
-# Class:: oar::dependencies
-#
-#
-class oar::dependencies {
-
-  package {
-    ["curl"]:
-      ensure  => installed;
-  }
-
-} # Class:: oar::dependencies
 
