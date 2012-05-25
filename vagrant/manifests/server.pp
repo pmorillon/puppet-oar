@@ -111,5 +111,17 @@ class vagrant::oar::mysql {
       require     => Exec["Mysql: init OAR database"];
   }
 
+  # Allow connection from all
+  file {
+    "/etc/mysql/conf.d/vagrant.cnf":
+      ensure  => file,
+      mode    => 644, owner => root, group => root,
+      content => "[mysqld]
+bind-address = 0.0.0.0
+",
+      notify  => Service["mysql"];
+  }
+
+
 } # Class:: vagrant::oar::mysql
 
