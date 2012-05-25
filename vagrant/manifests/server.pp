@@ -60,7 +60,8 @@ exec {
 
 service {
   "oar-node":
-    enable => true;
+    enable => true,
+    require => Package["oar-node"];
 }
 
 # Class:: vagrant::oar::mysql

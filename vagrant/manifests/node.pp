@@ -52,7 +52,8 @@ file {
 
 service {
   "oar-node":
-    enable => true;
+    enable  => true,
+    require => Package["oar-node"];
 }
 
 exec {
