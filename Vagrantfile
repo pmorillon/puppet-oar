@@ -25,5 +25,10 @@ Vagrant::Config.run do |config|
     end
   end
 
+  # To add several nodes, use these IP addresses :
+  # node1 : 192.168.1.101
+  # node2 : 192.168.1.102
+  # node3 : 192.168.1.103
+
 end
 

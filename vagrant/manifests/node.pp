@@ -39,4 +39,27 @@ file {
     ensure  => file,
     mode    => 644, owner => root, group => root,
     source  =>  "${files_path}/conf/node/oar-node";
+  "/etc/hosts":
+    ensure  => file,
+    mode    => 644, owner => root, group => root,
+    content => template("${files_path}/conf/node/hosts.erb");
+  "/etc/hostname":
+    ensure  => file,
+    mode    => 644, owner => root, group => root,
+    content => template("${files_path}/conf/node/hostname.erb"),
+    notify  => Exec["/etc/init.d/hostname.sh"];
 }
+
+service {
+  "oar-node":
+    enable => true;
+}
+
+exec {
+  "/etc/init.d/hostname.sh":
+    refreshonly => true,
+    notify      => Exec["/etc/init.d/oar-node restart"];
+  "/etc/init.d/oar-node restart":
+    refreshonly => true;
+}
+

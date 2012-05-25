@@ -27,20 +27,40 @@ file {
     source  => "${files_path}/conf/server/hosts",
     require => Package["oar-server"];
   "${oar_home}/.ssh/authorized_keys":
-    ensure => file,
-    mode => 644, owner => oar, group => oar,
-    source => "${files_path}/keys/server/authorized_keys",
+    ensure  => file,
+    mode    => 644, owner => oar, group => oar,
+    source  => "${files_path}/keys/server/authorized_keys",
     require => Package["oar-server"];
   "${oar_home}/.ssh/id_rsa":
-    ensure => file,
-    mode => 600, owner => oar, group => oar,
-    source => "${files_path}/keys/server/id_rsa",
+    ensure  => file,
+    mode    => 600, owner => oar, group => oar,
+    source  => "${files_path}/keys/server/id_rsa",
     require => Package["oar-server"];
   "${oar_home}/.ssh/id_rsa.pub":
-    ensure => file,
-    mode => 644, owner => oar, group => oar,
-    source => "${files_path}/keys/server/id_rsa.pub",
+    ensure  => file,
+    mode    => 644, owner => oar, group => oar,
+    source  => "${files_path}/keys/server/id_rsa.pub",
     require => Package["oar-server"];
+  "/etc/hostname":
+    ensure  => file,
+    mode    => 644, owner => root, group => root,
+    content => "oar-server
+",
+    require => Exec["Mysql: add OAR default datas"],
+    notify  => Exec["/etc/init.d/hostname.sh"];
+}
+
+exec {
+  "/etc/init.d/hostname.sh":
+    refreshonly => true,
+    notify      => [Service["oar-server"], Exec["/etc/init.d/oar-node restart"]];
+  "/etc/init.d/oar-node restart":
+    refreshonly => true;
+}
+
+service {
+  "oar-node":
+    enable => true;
 }
 
 # Class:: vagrant::oar::mysql
