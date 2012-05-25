@@ -25,7 +25,7 @@ class oar::server ($version = "2.5", $db = "mysql") {
     }
   }
 
-} # Class:: oar::server ($version = "2.5") inherits oar
+} # Class:: oar::server ($version = "2.5", $db = "mysql") inherits oar
 
 
 # Class:: oar::server::debian inherits oar::server::base

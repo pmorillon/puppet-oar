@@ -2,14 +2,18 @@
 # Manifest:: classes/frontend.pp
 #
 
-# Class:: oar::frontend ($version = "2.5")
+# Class:: oar::frontend ($version = "2.5", $db = "mysql")
 #
 #
-class oar::frontend ($version = "2.5") {
+class oar::frontend ($version = "2.5", $db = "mysql") {
 
   # Allow to install frontend and server on the same machine
   if !defined(Class["oar"]) {
-    class { "oar": version => $version; }
+    class {
+      "oar":
+        version => $version,
+        db      => $db;
+    }
   }
 
   case $operatingsystem {
@@ -21,20 +25,20 @@ class oar::frontend ($version = "2.5") {
     }
   }
 
-} # Class:: oar::frontend ($version = "2.5")
+} # Class:: oar::frontend ($version = "2.5", $db = "mysql")
 
 # Class:: oar::frontend::debian inherits oar::frontend::base
 #
 #
 class oar::frontend::debian inherits oar::frontend::base {
-  
+
 } # Class:: oar::frontend::debian inherits oar::frontend::base
 
 # Class:: oar::frontend::base inherits oar
 #
 #
 class oar::frontend::base inherits oar {
-  
+
   package {
     ["oar-user", "oar-node"]:
       ensure  => installed,
@@ -43,10 +47,15 @@ class oar::frontend::base inherits oar {
 
   if $oar::version == "2.5" {
     package {
-      "oar-user-mysql":
-        ensure  => installed,
-        require => Package["oar-user"];
+      "db-server":
+      name    => $oar::db ? {
+        "mysql" => "oar-user-mysql",
+        "pgsql" => "oar-user-pgsql",
+      },
+      ensure  => installed,
+      require => Package["oar-user"];
     }
   }
 
 } # Class:: oar::frontend::base inherits oar
+
