@@ -120,7 +120,8 @@ class vagrant::oar::mysql {
       content => "[mysqld]
 bind-address = 0.0.0.0
 ",
-      notify  => Service["mysql"];
+      notify  => Service["mysql"],
+      require => Package["mysql-server"];
   }
 
 
