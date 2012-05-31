@@ -2,7 +2,7 @@
 
 $oar_version = "2.5"
 $oar_home    = "/var/lib/oar"
-$files_path  = "/tmp/vagrant-puppet/manifests/files"
+$files_path  = "/srv/vagrant-puppet/manifests/files"
 
 class {
   "oar::server":
