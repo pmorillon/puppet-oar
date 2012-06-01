@@ -8,7 +8,7 @@
 define oar::configure_repo($version) {
 
   case $operatingsystem {
-    debian: {
+    debian,ubuntu: {
       file {
         "/etc/apt/sources.list.d/oar.list":
           ensure  => file,
@@ -30,9 +30,6 @@ define oar::configure_repo($version) {
           cwd         => "/tmp",
           notify      => Exec["OAR APT sources update"];
       }
-    }
-    centos: {
-
     }
     default: {
       err "${operatingsystem} not supported yet"

@@ -27,6 +27,16 @@ class oar::server ($version = "2.5", $db = "mysql") {
 
 } # Class:: oar::server ($version = "2.5", $db = "mysql") inherits oar
 
+# Class:: oar::server::ubuntu
+#
+#
+class oar::server::ubuntu inherits oar::server::base {
+
+  include "oar::server::debian"
+
+  Service["oar-server"] { provider => init, hasstatus => false }
+
+} # Class:: oar::server::ubuntu
 
 # Class:: oar::server::debian inherits oar::server::base
 #

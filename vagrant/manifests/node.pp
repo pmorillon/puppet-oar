@@ -64,3 +64,8 @@ exec {
     refreshonly => true;
 }
 
+if ($operatingsystem == "Ubuntu") {
+  Exec["/etc/init.d/hostname.sh"] { command => "/etc/init.d/hostname restart" }
+}
+
+

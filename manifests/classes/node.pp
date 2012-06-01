@@ -23,6 +23,15 @@ class oar::node ($version = "2.5") {
 
 } # Class:: oar::node ($version = "2.5")
 
+# Class:: oar::node::ubuntu
+#
+#
+class oar::node::ubuntu {
+
+  include "oar::node::debian"
+
+} # Class:: oar::node::ubuntu
+
 # Class:: oar::node::debian inherits oar::node::base
 #
 #

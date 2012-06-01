@@ -55,7 +55,12 @@ exec {
     refreshonly => true,
     notify      => [Service["oar-server"], Exec["/etc/init.d/oar-node restart"]];
   "/etc/init.d/oar-node restart":
-    refreshonly => true;
+    refreshonly => true,
+    require     => Package["oar-node"];
+}
+
+if ($operatingsystem == "Ubuntu") {
+  Exec["/etc/init.d/hostname.sh"] { command => "/etc/init.d/hostname restart" }
 }
 
 service {
