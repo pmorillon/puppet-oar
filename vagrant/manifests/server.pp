@@ -9,7 +9,9 @@ class {
     version => $oar_version,
     db      => "mysql";
   "oar::frontend":
-    version =>  $oar_version,
+    version => $oar_version;
+  "oar::api":
+    version => $oar_version;
 }
 
 include "vagrant::oar::mysql"
@@ -48,6 +50,12 @@ file {
 ",
     require => Exec["Mysql: add OAR default datas"],
     notify  => Exec["/etc/init.d/hostname.sh"];
+  "/etc/oar/apache2/oar-restful-api.conf":
+    ensure  => file,
+    mode    => 600, owner => www-data, group => root,
+    source  => "${files_path}/conf/server/oar-restful-api.conf",
+    require => Package["oar-api"],
+    notify  => Service["apache2"];
 }
 
 exec {
@@ -67,7 +75,24 @@ service {
   "oar-node":
     enable => true,
     require => Package["oar-node"];
+  "apache2":
+    ensure  => running,
+    require => Package["oar-api"];
 }
+
+package {
+  "oidentd":
+    ensure  => installed;
+}
+
+exec {
+  "enable module ident":
+    command => "/usr/sbin/a2enmod ident",
+    unless => "/bin/ls /etc/apache2/mods-enabled/ | grep 'ident'",
+    notify => Service["apache2"],
+    require => Package["oar-api"];
+}
+
 
 # Class:: vagrant::oar::mysql
 #
