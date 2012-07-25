@@ -25,7 +25,22 @@ This module just install OAR. See vagrant manifests for the configuration part.
 
     class {
       "oar::node":
-        version => $oar_version;
+        version => "2.5";
+    }
+
+### API
+
+    class {
+      "oar::api":
+        version => "2.5";
+    }
+
+### Try OAR development snapshots
+
+    class {
+      "oar::server":
+        version   => "2.5",
+        snapshots => true;
     }
 
 ## Testing with vagrant
