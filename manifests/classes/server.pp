@@ -5,14 +5,15 @@
 # Class:: oar::server ($version = "2.5") inherits oar
 #
 #
-class oar::server ($version = "2.5", $db = "mysql") {
+class oar::server ($version = "2.5", $db = "mysql", $snapshots = false) {
 
   # Allow to install frontend and server on the same machine
   if !defined(Class["oar"]) {
     class {
       "oar":
-        version => $version,
-        db      => $db;
+        version   => $version,
+        db        => $db,
+        snapshots => $snapshots;
     }
   }
 

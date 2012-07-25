@@ -5,13 +5,14 @@
 # Class:: oar::api ($version = "2.5")
 #
 #
-class oar::api ($version = "2.5") {
+class oar::api ($version = "2.5", $snapshots = false) {
 
   # Allow to install frontend and server on the same machine
   if !defined(Class["oar"]) {
     class {
       "oar":
-        version => $version;
+        version   => $version,
+        snapshots => $snapshots;
     }
   }
 

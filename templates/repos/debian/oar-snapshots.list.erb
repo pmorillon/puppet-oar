@@ -1,0 +1,10 @@
+# INSTALLED BY PUPPET
+# Module:   oar
+# Template: repos/debian/oar.list
+
+<% case scope.lookupvar('operatingsystem') -%>
+<% when "Debian" -%>
+deb http://oar-ftp.imag.fr/oar/<%= scope.lookupvar('version') %>/debian/ <%= scope.lookupvar('lsbdistcodename') %>-snapshots main
+<% when "Ubuntu" -%>
+deb http://oar-ftp.imag.fr/oar/<%= scope.lookupvar('version') %>/debian/ squeeze-snapshots main
+<% end -%>

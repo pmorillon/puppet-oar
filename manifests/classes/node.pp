@@ -5,11 +5,12 @@
 # Class:: oar::node ($version = "2.5")
 #
 #
-class oar::node ($version = "2.5") {
+class oar::node ($version = "2.5", $snapshots = false) {
 
   class {
     "oar":
-      version => $version;
+      version   => $version,
+      snapshots => $snapshots;
   }
 
   case $operatingsystem {

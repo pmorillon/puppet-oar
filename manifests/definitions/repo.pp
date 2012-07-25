@@ -5,7 +5,7 @@
 # Define:: oar::configure_repo
 # Args:: $version
 #
-define oar::configure_repo($version) {
+define oar::configure_repo($version, $snapshots) {
 
   case $operatingsystem {
     debian,ubuntu: {
@@ -13,7 +13,10 @@ define oar::configure_repo($version) {
         "/etc/apt/sources.list.d/oar.list":
           ensure  => file,
           mode    => 644, owner => root, group => root,
-          content => template("oar/repos/debian/oar.list.erb"),
+          content => $snapshots ? {
+            true => template("oar/repos/debian/oar-snapshots.list.erb"),
+            false => template("oar/repos/debian/oar.list.erb"),
+          },
           notify  => Exec["OAR APT sources update"],
           require => Exec["Add APT key"];
       }
