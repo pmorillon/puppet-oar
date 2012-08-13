@@ -37,7 +37,7 @@ class oar::node::ubuntu {
 #
 #
 class oar::node::debian inherits oar::node::base {
-  
+
 
 } # Class:: oar::node::debian inherits oar::node::base
 
@@ -45,11 +45,17 @@ class oar::node::debian inherits oar::node::base {
 #
 #
 class oar::node::base inherits oar {
-  
+
   package {
     "oar-node":
       ensure  => installed,
       require => Oar::Configure_repo["oar"];
+  }
+
+  service {
+    "oar-node":
+      enable  => true,
+      require => Package["oar-node"];
   }
 
 } # Class:: oar::node::base inherits oar
