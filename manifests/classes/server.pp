@@ -74,6 +74,8 @@ class oar::server::base inherits oar {
       ensure => running,
       pattern => "Almighty",
       enable => true,
+      hasstatus => false,
+      status    => "ps -u oar | grep Almighty",
       require => Package["oar-server"];
   }
 
