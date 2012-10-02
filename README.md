@@ -43,6 +43,49 @@ This module just install OAR. See vagrant manifests for the configuration part.
         snapshots => true;
     }
 
+## Definitions
+
+### oar::property
+
+    oar::property {
+      ["cpu", "core", "duration_weight"]:
+        ensure  => present;
+      ["ip", "infiniband", "slice", "hyperthreading", "interactive", "maintenance", "gpu", "room"]:
+        ensure  => present,
+        options => "-c";
+    }
+
+
+## Custom Types
+
+### oar_admission_rule
+
+Manage OAR admission rule from puppet manifests. Only MySQL provider is available (PgSQL will be available).
+
+    Oar_admission_rule {
+      db_name     => "oar2",
+      db_hostname => "localhost",
+      db_user     => "oar",
+      db_password => "xxxx",
+      provider    => mysql;
+    }
+    
+    oar_admission_rule {
+      "Dedicated interactive queue":
+        content => template("igrida/oar/admission_rules/dedicated_interactive.pl");
+      "Limit number of jobs":
+        content => template("igrida/oar/admission_rules/limit_number_of_jobs.pl");
+      "Maintenance in progress":
+        ensure  => absent,
+        content => '
+    # Description : Rules to block submission during a maintenance
+    
+    if ($queue_name ne "admin") {
+      die("[ADMISSION_RULES] Maintenance in progress");
+    }
+    ';
+    }
+
 ## Testing with vagrant
 
 ### Booting VMS
