@@ -43,20 +43,30 @@ This module just install OAR. See vagrant manifests for the configuration part.
         snapshots => true;
     }
 
-## Definitions
 
-### oar::property
+## Custom Types
 
-    oar::property {
-      ["cpu", "core", "duration_weight"]:
-        ensure  => present;
-      ["ip", "infiniband", "slice", "hyperthreading", "interactive", "maintenance", "gpu", "room"]:
-        ensure  => present,
-        options => "-c";
+### oar_queue
+
+    oar_queue {
+      "testing":
+        ensure    => present,
+        priority  => 1,
+        scheduler => "oar_sched_gantt_with_timesharing",
+        enabled   => true;
     }
 
 
-## Custom Types
+### oar_property
+
+    oar_property {
+      "duration_weight":
+        ensure  => present;
+      ["room", "maintenance", "infiniband"]:
+        ensure  => present,
+        varchar => true;
+    }
+
 
 ### oar_admission_rule
 

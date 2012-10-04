@@ -19,13 +19,13 @@ include "vagrant::oar::mysql"
 oar_property {
   "duration_weight":
     ensure  => present;
-  "room":
+  ["room", "maintenance", "infiniband"]:
     ensure  => present,
     varchar => true;
 }
 
 oar_queue {
-  "interactive":
+  "testing":
     ensure    => present,
     priority  => 1,
     scheduler => "oar_sched_gantt_with_timesharing",
