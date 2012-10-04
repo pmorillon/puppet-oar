@@ -16,6 +16,14 @@ class {
 
 include "vagrant::oar::mysql"
 
+oar_property {
+  "duration_weight":
+    ensure  => present;
+  "room":
+    ensure  => present,
+    varchar => true;
+}
+
 file {
   "/etc/oar/oar.conf":
     ensure  => file,

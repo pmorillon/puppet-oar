@@ -1,5 +1,6 @@
 #This is a type to manage OAR adminssion rules
-Puppet::Type.newtype(:oar_admission_rule)do
+
+Puppet::Type.newtype(:oar_admission_rule) do
   @doc = "Manage OAR adminssion rules"
 
   ensurable do
