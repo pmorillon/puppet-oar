@@ -23,3 +23,4 @@ Puppet::Type.newtype(:oar_property) do
   end
 
 end
+

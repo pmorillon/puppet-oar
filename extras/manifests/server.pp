@@ -24,6 +24,14 @@ oar_property {
     varchar => true;
 }
 
+oar_queue {
+  "interactive":
+    ensure    => present,
+    priority  => 1,
+    scheduler => "oar_sched_gantt_with_timesharing",
+    enabled   => true;
+}
+
 file {
   "/etc/oar/oar.conf":
     ensure  => file,
