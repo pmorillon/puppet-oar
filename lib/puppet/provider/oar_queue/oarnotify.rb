@@ -26,10 +26,14 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
 
   def add
     oarnotify("--add_queue", "#{resource[:name]},#{resource[:priority]},#{resource[:scheduler]}")
+    state = queues.select { |queue| queue[:name] == resource[:name] }.first[:state]
+    if resource[:enabled] == :false
+      oarnotify("-d", resource[:name])
+    end
   end
 
   def remove
-
+    oarnotify("--remove_queue", resource[:name])
   end
 
   def exists?
