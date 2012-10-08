@@ -16,12 +16,24 @@ class {
 
 include "vagrant::oar::mysql"
 
+# Create OAR properties
+
+Oar_property {
+  require => Class["vagrant::oar::mysql"]
+}
+
 oar_property {
-  "duration_weight":
+  ["cpu", "core"]:
     ensure  => present;
-  ["room", "maintenance", "infiniband"]:
+  "ip":
     ensure  => present,
     varchar => true;
+}
+
+# Create OAR queues
+
+Oar_queue {
+  require => Class["vagrant::oar::mysql"]
 }
 
 oar_queue {
@@ -29,7 +41,7 @@ oar_queue {
     ensure    => present,
     priority  => 1,
     scheduler => "oar_sched_gantt_with_timesharing",
-    enabled   => true;
+    enabled   => false;
 }
 
 file {

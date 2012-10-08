@@ -106,13 +106,6 @@ Start 2 VMs, one server and one node :
 
 ### Add OAR properties and resources
 
-    $ vagrant ssh server
-    vagrant@oar-server:~$ sudo oarproperty -a cpu
-    Added property: cpu
-    vagrant@oar-server:~$ sudo oarproperty -a core
-    Added property: cpu
-    vagrant@oar-server:~$ sudo oarproperty -a ip -c
-    Added property: cpu
     vagrant@oar-server:~$ sudo oaradmin re -a /node=node1/cpu=1/core={2}/ip=192.168.1.101/ -c
     oarnodesetting -a -h node1 -p cpu=1 -p core=1 -p ip=192.168.1.101  -p cpuset=0
     oarnodesetting -a -h node1 -p cpu=1 -p core=2 -p ip=192.168.1.101  -p cpuset=1

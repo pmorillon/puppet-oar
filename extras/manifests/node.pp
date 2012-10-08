@@ -50,12 +50,6 @@ file {
     notify  => Exec["/etc/init.d/hostname.sh"];
 }
 
-service {
-  "oar-node":
-    enable  => true,
-    require => Package["oar-node"];
-}
-
 exec {
   "/etc/init.d/hostname.sh":
     refreshonly => true,
