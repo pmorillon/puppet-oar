@@ -1,0 +1,23 @@
+FORGE
+  remote: http://forge.puppetlabs.com
+  specs:
+    puppetlabs/apache (0.4.0)
+      puppetlabs/firewall (>= 0.0.4)
+      puppetlabs/stdlib (>= 2.2.1)
+    puppetlabs/apt (1.1.0)
+      puppetlabs/stdlib (>= 2.2.1)
+    puppetlabs/firewall (0.0.4)
+    puppetlabs/mysql (0.6.1)
+      puppetlabs/stdlib (>= 2.2.1)
+    puppetlabs/postgresql (2.0.1)
+      puppetlabs/apt (< 2.0.0, >= 1.1.0)
+      puppetlabs/firewall (>= 0.0.4)
+      puppetlabs/stdlib (< 4.0.0, >= 3.2.0)
+    puppetlabs/stdlib (3.2.0)
+
+DEPENDENCIES
+  puppetlabs/apache (= 0.4.0)
+  puppetlabs/mysql (= 0.6.1)
+  puppetlabs/postgresql (= 2.0.1)
+  puppetlabs/stdlib (= 3.2.0)
+

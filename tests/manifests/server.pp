@@ -1,25 +1,42 @@
 # OAR server installation with puppet and vagrant
 
+include 'apache'
+
 $oar_version = "2.5"
 $oar_home    = "/var/lib/oar"
 $files_path  = "/srv/vagrant-puppet/manifests/files"
 
+if $oar_db {
+  case $oar_db {
+    mysql,pgsql: {
+      notice("Using ${oar_db} backend.")
+    }
+    default: {
+      error("${oar_db} databases are not supported.")
+    }
+  }
+} else {
+  $oar_db = "mysql"
+  notice("Using default ${oar_db} backend")
+}
+
 class {
   "oar::server":
     version => $oar_version,
-    db      => "mysql";
+    db      => $oar_db;
   "oar::frontend":
     version => $oar_version;
   "oar::api":
     version => $oar_version;
 }
 
-include "vagrant::oar::mysql"
+include "vagrant::oar::${oar_db}"
+include 'vagrant::oar::api'
 
 # Create OAR properties
 
 Oar_property {
-  require => Class["vagrant::oar::mysql"]
+  require => Class["vagrant::oar::${oar_db}"]
 }
 
 oar_property {
@@ -33,7 +50,7 @@ oar_property {
 # Create OAR queues
 
 Oar_queue {
-  require => Class["vagrant::oar::mysql"]
+  require => Class["vagrant::oar::${oar_db}"]
 }
 
 oar_queue {
@@ -76,7 +93,7 @@ file {
     mode    => 644, owner => root, group => root,
     content => "oar-server
 ",
-    require => Exec["Mysql: add OAR default datas"],
+    require => Exec["${oar_db}: add OAR default datas"],
     notify  => Exec["/etc/init.d/hostname.sh"];
   "/etc/oar/apache2/oar-restful-api.conf":
     ensure  => file,
@@ -103,10 +120,9 @@ service {
   "oar-node":
     enable => true,
     require => Package["oar-node"];
-  "apache2":
-    ensure  => running,
-    require => Package["oar-api"];
 }
+
+Package['oar-api'] -> Service['apache2']
 
 package {
   "oidentd":
@@ -129,59 +145,87 @@ class vagrant::oar::mysql {
 
   $db_name = "oar2"
 
+  class { 'mysql::server':
+    config_hash => { 'root_password' => '' , 'bind_address' => '0.0.0.0' }
+  }
+
+  mysql::db {
+    $db_name:
+      user      => 'oar',
+      password  => 'vagrant',
+      host      => '%',
+      charset   => 'latin1',
+      grant     => ['all'];
+  }
+
+  database_user {
+    'oar_ro@%':
+      password_hash => mysql_password('vagrant');
+  }
+
+  database_grant {
+    'oar_ro@%/oar2':
+      privileges => ['Select_priv'];
+  }
+
+  exec {
+    'mysql: init OAR database':
+      command => '/usr/bin/mysql oar2 < /usr/lib/oar/database/mysql_structure.sql',
+      unless  => '/usr/bin/mysql -u root --execute="SHOW TABLES;" oar2 | grep jobs',
+      require => [Mysql::Db[$db_name],Package['oar-server']],
+      notify  => Exec['mysql: add OAR default datas', 'mysql: add OAR default admission rules'];
+    'mysql: add OAR default datas':
+      command     => '/usr/bin/mysql oar2 < /usr/lib/oar/database/default_data.sql',
+      refreshonly => true,
+      require     => Exec['mysql: init OAR database'],
+      notify      => Service['oar-server'];
+    'mysql: add OAR default admission rules':
+      command     => '/usr/bin/mysql oar2 < /usr/lib/oar/database/mysql_default_admission_rules.sql',
+      refreshonly => true,
+      require     => Exec['mysql: add OAR default datas'];
+  }
+
+} # Class:: vagrant::oar::mysql
+
+# Class:: vagrant::oar::pgsql
+#
+#
+class vagrant::oar::pgsql {
+
   package {
-    "mysql-server":
+    "postgresql":
       ensure  => installed;
   }
 
   service {
-    "mysql":
+    "postgresqld":
       ensure  => running,
+      name    => "postgresql-8.4", # Ubuntu dependant
       enable  => true,
-      require => Package["mysql-server"];
+      require => Package["postgresql"];
   }
 
   exec {
-    "Mysql: create ${db_name} db":
-      command => "/usr/bin/mysql --execute=\"CREATE DATABASE ${db_name};\"",
-      unless  => "/usr/bin/mysql --execute=\"SHOW DATABASES;\" | grep '^${db_name}$'",
-      require => Service["mysql"];
-    "Mysql: init oar privileges":
-      command => "/usr/bin/mysql --execute=\"GRANT ALL PRIVILEGES ON ${db_name}.* TO \'oar\'@\'%\' IDENTIFIED BY \'vagrant\';\"",
-      unless  => "/usr/bin/mysql --execute=\"SHOW GRANTS FOR oar@\'%\';\"",
-      require => Exec["Mysql: create ${db_name} db"];
-    "Mysql: init oar_ro privileges":
-      command => "/usr/bin/mysql --execute=\"GRANT SELECT ON ${db_name}.* TO \'oar_ro\'@\'%\' IDENTIFIED BY \'vagrant\';\"",
-      unless  => "/usr/bin/mysql --execute=\"SHOW GRANTS FOR oar_ro@\'%\';\"",
-      require => Exec["Mysql: create ${db_name} db"];
-    "Mysql: init OAR database":
-      command => "/usr/bin/mysql oar2 < /usr/lib/oar/database/mysql_structure.sql",
-      unless  => "/usr/bin/mysql -u root --execute=\"SHOW TABLES;\" oar2 | grep jobs",
-      require => [Exec["Mysql: create ${db_name} db"],Package["oar-server"]],
-      notify  => Exec["Mysql: add OAR default datas", "Mysql: add OAR default admission rules"];
-    "Mysql: add OAR default datas":
-      command     => "/usr/bin/mysql oar2 < /usr/lib/oar/database/default_data.sql",
+    "add OAR default datas":
+      command     => "/bin/true",
       refreshonly => true,
-      require     => Exec["Mysql: init OAR database"],
+      require     => Exec["pgsql: init OAR database"],
       notify      => Service["oar-server"];
-    "Mysql: add OAR default admission rules":
-      command     => "/usr/bin/mysql oar2 < /usr/lib/oar/database/mysql_default_admission_rules.sql",
-      refreshonly => true,
-      require     => Exec["Mysql: init OAR database"];
-  }
 
-  # Allow connection from all
-  file {
-    "/etc/mysql/conf.d/vagrant.cnf":
-      ensure  => file,
-      mode    => 644, owner => root, group => root,
-      content => "[mysqld]
-bind-address = 0.0.0.0
-",
-      notify  => Service["mysql"],
-      require => Package["mysql-server"];
   }
 
 
-} # Class:: vagrant::oar::mysql
+} # Class:: vagrant::oar::pgsql
 
+# Class:: vagrant::oar::api
+#
+#
+class vagrant::oar::api {
+
+  include 'apache'
+
+  apache::mod {
+    ['ident', 'headers', 'rewrite']:
+  }
+
+} # Class:: vagrant::oar::api

@@ -1,0 +1,5 @@
+source 'http://rubygems.org'
+
+# Using Librarion Puppet to manage puppet modules dependencies
+gem 'librarian-puppet-maestrodev', '0.9.7.4'
+
