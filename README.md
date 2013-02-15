@@ -98,6 +98,17 @@ Manage OAR admission rule from puppet manifests. Only MySQL provider is availabl
 
 ## Testing with vagrant
 
+### Configure
+
+Install Ruby gems :
+
+    $ cd tests
+    $ bundle install
+
+Download required Puppet modules :
+
+    $ librarian-puppet install
+
 ### Booting VMS
 
 Start 2 VMs, one server and one node :
@@ -122,4 +133,26 @@ Start 2 VMs, one server and one node :
 
     Connect to OAR job 1 via the node node1
     vagrant@node1:~$
+
+### Submit a job with OAR API
+
+    vagrant@oar-server:~$ curl -X POST -H'Accept: application/json' -H'Content: application/json' -ki http://localhost/oarapi/jobs.json -d 'resources=core=1&command=sleep 60&name=Test'
+    HTTP/1.1 201 Created
+    Date: Fri, 15 Feb 2013 08:53:21 GMT
+    Server: Apache/2.2.16 (Debian)
+    Location: /oarapi/jobs/2
+    Transfer-Encoding: chunked
+    Content-Type: application/json
+    
+    {
+       "cmd_output" : "[ADMISSION RULE] Set default walltime to 7200.\n[ADMISSION RULE] Modify resource description with type constraints\nGenerate a job key...\nOAR_JOB_ID=2\n",
+       "api_timestamp" : 1360918404,
+       "id" : 2,
+       "links" : [
+          {
+             "rel" : "self",
+             "href" : "/oarapi/jobs/2"
+          }
+       ]
+    }
 
