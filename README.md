@@ -1,6 +1,6 @@
 # Puppet-oar module
 
-This module just install OAR. See vagrant manifests for the configuration part.
+This module just install OAR. See testing manifests (`tests/manifests`) for the configuration part.
 
 ## Usage
 
@@ -95,6 +95,16 @@ Manage OAR admission rule from puppet manifests. Only MySQL provider is availabl
     }
     ';
     }
+
+
+## Librarian-puppet setup
+
+Edit your `Puppetfile` :
+
+    mod 'oar',
+      :git => 'git://github.com/pmorillon/puppet-oar.git',
+      :ref => '0.0.4'
+
 
 ## Testing with vagrant
 
