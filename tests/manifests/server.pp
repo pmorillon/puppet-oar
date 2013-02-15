@@ -125,16 +125,8 @@ service {
 Package['oar-api'] -> Service['apache2']
 
 package {
-  "oidentd":
+  ['oidentd', 'curl']:
     ensure  => installed;
-}
-
-exec {
-  "enable module ident":
-    command => "/usr/sbin/a2enmod ident",
-    unless => "/bin/ls /etc/apache2/mods-enabled/ | grep 'ident'",
-    notify => Service["apache2"],
-    require => Package["oar-api"];
 }
 
 
