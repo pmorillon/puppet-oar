@@ -50,7 +50,7 @@ class oar::frontend::debian inherits oar::frontend::base {
 class oar::frontend::base inherits oar {
 
   package {
-    ["oar-user", "oar-node"]:
+    ["oar-user"]:
       ensure  => installed,
       require => Oar::Configure_repo["oar"];
   }

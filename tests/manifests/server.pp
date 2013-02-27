@@ -106,20 +106,11 @@ file {
 exec {
   "/etc/init.d/hostname.sh":
     refreshonly => true,
-    notify      => [Service["oar-server"], Exec["/etc/init.d/oar-node restart"]];
-  "/etc/init.d/oar-node restart":
-    refreshonly => true,
-    require     => Package["oar-node"];
+    notify      => Service["oar-server"];
 }
 
 if ($operatingsystem == "Ubuntu") {
   Exec["/etc/init.d/hostname.sh"] { command => "/etc/init.d/hostname restart" }
-}
-
-service {
-  "oar-node":
-    enable => true,
-    require => Package["oar-node"];
 }
 
 Package['oar-api'] -> Service['apache2']
@@ -127,6 +118,19 @@ Package['oar-api'] -> Service['apache2']
 package {
   ['oidentd', 'curl']:
     ensure  => installed;
+}
+
+service {
+  'ssh':
+    ensure  => running,
+    enable  => true;
+}
+
+augeas {
+  'sshd_config_PermitUserEnvironment':
+    context   => 'files/etc/ssh/sshd_config',
+    changes   => 'set /files/etc/ssh/sshd_config/PermitUserEnvironment yes',
+    notify    => Service['ssh'];
 }
 
 
