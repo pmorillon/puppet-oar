@@ -4,7 +4,7 @@ include 'apache'
 
 $oar_version = "2.5"
 $oar_home    = "/var/lib/oar"
-$files_path  = "/srv/vagrant-puppet/manifests/files"
+$files_path  = "/vagrant/manifests/files"
 
 if $oar_db {
   case $oar_db {
@@ -61,11 +61,25 @@ oar_queue {
     enabled   => false;
 }
 
+Oar_admission_rule {
+  db_name     => 'oar2',
+  db_hostname => 'localhost',
+  db_user     => 'oar',
+  db_password => 'vagrant',
+  provider    => $oar_db
+}
+
+oar_admission_rule {
+  'Maintenance in progress':
+    ensure  => present,
+    content => '#blablabla';
+}
+
 file {
   "/etc/oar/oar.conf":
     ensure  => file,
     mode    => 600, owner => oar, group => root,
-    source  => "${files_path}/conf/server/oar.conf",
+    source  => "${files_path}/conf/server/oar.conf_${oar_db}",
     require => Package["oar-server"],
     notify  => Service["oar-server"];
   "/etc/hosts":
@@ -91,9 +105,8 @@ file {
   "/etc/hostname":
     ensure  => file,
     mode    => 644, owner => root, group => root,
-    content => "oar-server
-",
-    require => Exec["${oar_db}: add OAR default datas"],
+    content => "oar-server",
+    #    require => Exec["${oar_db}: add OAR default datas"],
     notify  => Exec["/etc/init.d/hostname.sh"];
   "/etc/oar/apache2/oar-restful-api.conf":
     ensure  => file,
@@ -188,25 +201,39 @@ class vagrant::oar::mysql {
 #
 class vagrant::oar::pgsql {
 
-  package {
-    "postgresql":
-      ensure  => installed;
+  $db_name = "oar2"
+
+  class {
+    'postgresql::server':
+      config_hash        => {
+        'listen_addresses' => '*'
+      }
   }
 
-  service {
-    "postgresqld":
-      ensure  => running,
-      name    => "postgresql-8.4", # Ubuntu dependant
-      enable  => true,
-      require => Package["postgresql"];
+  postgresql::db {
+    $db_name:
+      user     => 'oar',
+      password => 'vagrant';
   }
 
   exec {
-    "add OAR default datas":
-      command     => "/bin/true",
+    'pgsql: init OAR database':
+      command     => '/usr/bin/psql -U oar -h localhost -d oar2 -f /usr/lib/oar/database/pg_structure.sql',
+      unless      => '/usr/bin/psql -U oar -h localhost -d oar2 -c "\dt" | grep jobs',
+      environment => "PGPASSWORD=vagrant",
+      require     => [Postgresql::Db[$db_name],Package['oar-server']],
+      notify  => Exec['pgsql: add OAR default datas', 'pgsql: add OAR default admission rules'];
+    'pgsql: add OAR default datas':
+      command     => '/usr/bin/psql -U oar -h localhost -d oar2 -f /usr/lib/oar/database/default_data.sql',
+      environment => "PGPASSWORD=vagrant",
       refreshonly => true,
-      require     => Exec["pgsql: init OAR database"],
-      notify      => Service["oar-server"];
+      require     => Exec['pgsql: init OAR database'],
+      notify      => Service['oar-server'];
+    'pgsql: add OAR default admission rules':
+      command     => '/usr/bin/psql -U oar -h localhost -d oar2 -f /usr/lib/oar/database/pg_default_admission_rules.sql',
+      environment => "PGPASSWORD=vagrant",
+      refreshonly => true,
+      require     => Exec['pgsql: add OAR default datas'];
 
   }
 
