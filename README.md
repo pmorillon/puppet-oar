@@ -77,7 +77,7 @@ Manage OAR admission rule from puppet manifests. Only MySQL provider is availabl
       db_hostname => "localhost",
       db_user     => "oar",
       db_password => "xxxx",
-      provider    => mysql;
+      provider    => mysql
     }
     
     oar_admission_rule {
