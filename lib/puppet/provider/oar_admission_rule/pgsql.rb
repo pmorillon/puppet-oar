@@ -13,7 +13,7 @@ Puppet::Type.type(:oar_admission_rule).provide(:pgsql) do
   def add
     rule_text = "# Puppet name : #{resource[:name]}\n"
     rule_text += resource[:content]
-    rule_text.gsub!(/\\|'/) { |x| "\\#{x}" }
+    rule_text.gsub!(/'/) { |x| "'#{x}" }
     Puppet::Util.withenv :PGPASSWORD => resource[:db_password] do
       psql("-h", resource[:db_hostname], "-U", resource[:db_user], "-d", resource[:db_name], "-c", "INSERT INTO admission_rules (rule) VALUES ('#{rule_text}')")
     end
@@ -51,7 +51,7 @@ Puppet::Type.type(:oar_admission_rule).provide(:pgsql) do
   def content=(rule)
     rule_text = "# Puppet name : #{resource[:name]}\n"
     rule_text += rule
-    rule_text.gsub!(/\\|'/) { |x| "\\#{x}" }
+    rule_text.gsub!(/'/) { |x| "'#{x}" }
     Puppet::Util.withenv :PGPASSWORD => resource[:db_password] do
       psql("-h", resource[:db_hostname], "-U", resource[:db_user], "-d", resource[:db_name], "-c", "UPDATE admission_rules SET rule='#{rule_text}' WHERE rule LIKE '# Puppet name : #{resource[:name]}%'")
     end
