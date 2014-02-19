@@ -57,13 +57,9 @@ class oar::frontend::base inherits oar {
 
   if $oar::version == "2.5" {
     package {
-      "db-user":
-      name    => $oar::db ? {
-        "mysql" => "oar-user-mysql",
-        "pgsql" => "oar-user-pgsql",
-      },
-      ensure  => installed,
-      require => Package["oar-user"];
+      ["oar-user-mysql","oar-user-pgsql"]:
+        ensure  => installed,
+        require => Package["oar-user"];
     }
   }
 
