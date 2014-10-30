@@ -4,6 +4,11 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
 
   optional_commands :oarnotify => "oarnotify"
 
+  oar_version = File.read('/usr/share/perl5/OAR/Version.pm').scan(/\d+\.\d+\.\d+/).first
+  $oarnotify_options = {}
+  $oarnotify_options[:add] = Gem::Version.new(oar_version) > Gem::Version.new('2.5.3') ? '--add-queue' : '--add_queue'
+  $oarnotify_options[:remove] = Gem::Version.new(oar_version) > Gem::Version.new('2.5.3') ? '--remove-queue' : '--remove_queue'
+
   def queues
 
     oar_queues = []
@@ -25,7 +30,7 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
   end
 
   def add
-    oarnotify("--add_queue", "#{resource[:name]},#{resource[:priority]},#{resource[:scheduler]}")
+    oarnotify($oarnotify_options[:add], "#{resource[:name]},#{resource[:priority]},#{resource[:scheduler]}")
     state = queues.select { |queue| queue[:name] == resource[:name] }.first[:state]
     if resource[:enabled] == :false
       oarnotify("-d", resource[:name])
@@ -33,7 +38,7 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
   end
 
   def remove
-    oarnotify("--remove_queue", resource[:name])
+    oarnotify($oarnotify_options[:remove], resource[:name])
   end
 
   def exists?
@@ -45,8 +50,8 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
   end
 
   def priority=(value)
-    oarnotify("--remove_queue", resource[:name])
-    oarnotify("--add_queue", "#{resource[:name]},#{resource[:priority]},#{resource[:scheduler]}")
+    oarnotify($oarnotify_options[:remove], resource[:name])
+    oarnotify($oarnotify_options[:add], "#{resource[:name]},#{resource[:priority]},#{resource[:scheduler]}")
   end
 
   def scheduler
@@ -54,8 +59,8 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
   end
 
   def scheduler=(value)
-    oarnotify("--remove_queue", resource[:name])
-    oarnotify("--add_queue", "#{resource[:name]},#{resource[:priority]},#{resource[:scheduler]}")
+    oarnotify($oarnotify_options[:remove], resource[:name])
+    oarnotify($oarnotify_options[:add], "#{resource[:name]},#{resource[:priority]},#{resource[:scheduler]}")
   end
 
   def enabled
