@@ -5,11 +5,6 @@ class oar::apt {
 
   include 'oar'
 
-  $debian_distribution = $oar::suite ? {
-    'stable' => $lsbdistcodename,
-    default  => inline_template('<%= @lsbdistcodename + "-" + scope.lookupvar("oar::suite") %>')
-  }
-
   file {
     '/etc/apt/sources.list.d/oar.list':
       ensure  => file,

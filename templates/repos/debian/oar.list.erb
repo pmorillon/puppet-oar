@@ -2,4 +2,4 @@
 # Module : oar
 # Source : template('oar/repos/debian/oar.list.erb')
 
-deb http://oar-ftp.imag.fr/oar/<%= scope.lookupvar("oar::major_release") %>/debian/ <%= @debian_distribution %> main
+deb http://oar-ftp.imag.fr/oar/<%= scope.lookupvar("oar::major_release") %>/debian/ <%= scope.lookupvar("oar::dist") %> <%= @component %>

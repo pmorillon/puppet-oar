@@ -5,7 +5,8 @@
 class oar(
   $version = "2.5.4-1",
   $db = "pgsql",
-  $suite = "stable"
+  $dist = $lsbdistcodename,
+  $component = "main"
 ) {
 
   $major_release = $version ? {
@@ -24,6 +25,12 @@ class oar(
     default:{
       err "${operatingsystem} not supported !"
     }
+  }
+
+  package {
+    ['oar-common', 'oar-doc']:
+      ensure  => installed,
+      require => Class['oar::apt'];
   }
 
 
