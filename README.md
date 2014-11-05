@@ -4,44 +4,57 @@ This module just install OAR. See testing manifests (`tests/manifests`) for the 
 
 ## Usage
 
+```Puppet
+class {
+  'oar':
+    version => 'latest',
+    db      => $oar_db,
+    suite   => 'stable';
+}
+```
 
 ### Server
 
-    class {
-      "oar::server":
-        version => "2.5",
-        db      => "mysql";
-    }
+```Puppet
+class {
+  'oar::server':
+}
+```
 
 ### Frontend (can be used on the OAR server)
 
-    class {
-      "oar::frontend":
-        version => "2.5",
-        db      => "mysql";
-    }
+```Puppet
+class {
+  'oar::frontend':
+}
+```
 
 ### Node
 
-    class {
-      "oar::node":
-        version => "2.5";
-    }
+```Puppet
+class {
+  'oar::node':
+}
+```
 
 ### API
 
-    class {
-      "oar::api":
-        version => "2.5";
-    }
+```Puppet
+class {
+  'oar::api':
+}
+```
 
 ### Try OAR development snapshots
 
-    class {
-      "oar::server":
-        version   => "2.5",
-        snapshots => true;
-    }
+```Puppet
+class {
+  'oar':
+    version => 'latest',
+    db      => $oar_db,
+    suite   => 'snapshots';
+}
+```
 
 
 ## Custom Types
@@ -127,9 +140,8 @@ Start 2 VMs, one server and one node :
 
 ### Add OAR properties and resources
 
-    vagrant@oar-server:~$ sudo oaradmin re -a /node=node1/cpu=1/core={2}/ip=192.168.1.101/ -c
-    oarnodesetting -a -h node1 -p cpu=1 -p core=1 -p ip=192.168.1.101  -p cpuset=0
-    oarnodesetting -a -h node1 -p cpu=1 -p core=2 -p ip=192.168.1.101  -p cpuset=1
+    vagrant@oar-server:~$ sudo oar_resources_add -H 1 -C 1 -c 2 --host-prefix "node" | sudo sh
+    vagrant@oar-server:~$ sudo oarnodesetting -h node1 -p ip=192.168.1.101
 
 ### Submit an interactive job
 
