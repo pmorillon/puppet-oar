@@ -4,23 +4,23 @@
 Vagrant::Config.run do |config|
 
   config.vm.define :server do |server|
-    server.vm.box = "debian-squeeze-x64-puppet_3.0.1.box"
-    server.vm.box_url = "https://vagrant.irisa.fr/boxes/debian-squeeze-x64-puppet_3.0.1.box"
+    server.vm.box = "irisa_debian-7.3.0_puppet-3.4.2.box"
+    server.vm.box_url = "https://vagrant.irisa.fr/boxes/irisa_debian-7.3.0_puppet-3.4.2.box"
     server.vm.network :hostonly, "192.168.1.10"
     server.vm.share_folder "puppet_modules", "/srv/puppet_modules/oar", ".."
-    ENV['FACTER_oar_db'] ||= "mysql"
-    server.vm.provision :puppet, :facter => { "oar_db" => ENV['FACTER_oar_db'] }, :pp_path => "/srv/vagrant-puppet", :options => ["--modulepath", "/srv/puppet_modules:/vagrant/modules"] do |puppet|
+    ENV['FACTER_oar_db'] ||= "pgsql"
+    server.vm.provision :puppet, :facter => { "oar_db" => ENV['FACTER_oar_db'] }, :options => ["--modulepath", "/srv/puppet_modules:/vagrant/modules"] do |puppet|
       puppet.manifests_path = "manifests"
-      puppet.manifest_file = "server.pp"
+      puppet.manifest_file = "server2.pp"
     end
   end
 
   config.vm.define :node1 do |node1|
-    node1.vm.box = "debian-squeeze-x64-puppet_3.0.1.box"
-    node1.vm.box_url = "https://vagrant.irisa.fr/boxes/debian-squeeze-x64-puppet_3.0.1.box"
+    node1.vm.box = "irisa_debian-7.3.0_puppet-3.4.2.box"
+    node1.vm.box_url = "https://vagrant.irisa.fr/boxes/irisa_debian-7.3.0_puppet-3.4.2.box"
     node1.vm.network :hostonly, "192.168.1.101"
     node1.vm.share_folder "puppet_modules", "/srv/puppet_modules/oar", ".."
-    node1.vm.provision :puppet, :pp_path => "/srv/vagrant-puppet", :options => ["--modulepath", "/srv/puppet_modules"] do |puppet|
+    node1.vm.provision :puppet, :options => ["--modulepath", "/srv/puppet_modules"] do |puppet|
       puppet.manifests_path = "manifests"
       puppet.manifest_file = "node.pp"
     end

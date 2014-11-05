@@ -1,44 +1,61 @@
 # OAR node installation with puppet and vagrant
 
-$oar_version = "2.5"
 $oar_home    = "/var/lib/oar"
-$files_path  = "/srv/vagrant-puppet/manifests/files"
+$files_path  = "/vagrant/manifests/files"
+
+class {
+  'oar':
+    version => 'latest',
+    db      => $oar_db,
+    suite   => 'stable';
+}
 
 class {
   "oar::node":
-    version => "2.5";
 }
 
-File { require => Package["oar-node"] }
+package {
+  'taktuk':
+    ensure => installed;
+}
+
+Package['oar-node'] -> File <| tag == 'oar_node_files' |>
 
 file {
   "${oar_home}/.ssh":
-    ensure  => directory,
-    mode    => 755, owner => oar, group => oar;
+    ensure => directory,
+    mode   => 755, owner => oar, group => oar,
+    tag    => 'oar_node_files';
   "${oar_home}/.ssh/authorized_keys":
     ensure  => file,
     mode    => 644, owner => oar, group => oar,
-    source  => "${files_path}/keys/node/authorized_keys";
+    source  => "${files_path}/keys/node/authorized_keys",
+    tag     => 'oar_node_files';
   "${oar_home}/.ssh/id_rsa":
     ensure  => file,
     mode    => 600, owner => oar, group => oar,
-    source  => "${files_path}/keys/node/oar/id_rsa";
+    source  => "${files_path}/keys/node/oar/id_rsa",
+    tag     => 'oar_node_files';
   "${oar_home}/.ssh/id_rsa.pub":
     ensure  => file,
     mode    => 644, owner => oar, group => oar,
-    source  => "${files_path}/keys/node/oar/id_rsa.pub";
+    source  => "${files_path}/keys/node/oar/id_rsa.pub",
+    tag     => 'oar_node_files';
   "${oar_home}/.ssh/oarnodesetting_ssh.key":
     ensure  => file,
     mode    => 600, owner => oar, group => oar,
-    source  => "${files_path}/keys/node/oarnodessetting/id_rsa";
+    source  => "${files_path}/keys/node/oarnodessetting/id_rsa",
+    tag     => 'oar_node_files';
   "${oar_home}/.ssh/oarnodesetting_ssh.key.pub":
     ensure  => file,
     mode    => 644, owner => oar, group => oar,
-    source  => "${files_path}/keys/node/oarnodessetting/id_rsa.pub";
+    source  => "${files_path}/keys/node/oarnodessetting/id_rsa.pub",
+    tag     => 'oar_node_files';
   "/etc/default/oar-node":
     ensure  => file,
     mode    => 644, owner => root, group => root,
-    source  =>  "${files_path}/conf/node/oar-node";
+    source  =>  "${files_path}/conf/node/oar-node",
+    tag     => 'oar_node_files';
   "/etc/hosts":
     ensure  => file,
     mode    => 644, owner => root, group => root,

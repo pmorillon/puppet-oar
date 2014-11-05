@@ -2,25 +2,29 @@
 # Manifest:: init.pp
 #
 
-import "definitions/*.pp"
-import "classes/*.pp"
+class oar(
+  $version = "2.5.4-1",
+  $db = "pgsql",
+  $suite = "stable"
+) {
 
-# Class:: oar ($version = "2.5")
-#
-#
-class oar ($version = "2.5", $db = "mysql", $snapshots = false) {
+  $major_release = $version ? {
+    'latest' => '2.5',
+    default => inline_template('<%= @version.gsub(/(\d+\.\d+).*$/,\'\1\') %>')
+  }
 
-    oar::configure_repo {
-      "oar":
-        version   => $version,
-        snapshots => $snapshots;
+  $home_path = '/var/lib/oar'
+
+  case $operatingsystem {
+    debian:{
+      class {
+        'oar::apt':
+      }
     }
-
-    package {
-      ["oar-common", "oar-doc"]:
-        ensure  => installed,
-        require => Oar::Configure_repo["oar"];
+    default:{
+      err "${operatingsystem} not supported !"
     }
+  }
 
-} # Class:: oar ($version = "2.5")
 
+}

@@ -1,14 +1,5 @@
 # INSTALLED BY PUPPET
-# Module:   oar
-# Template: repos/debian/oar.list
+# Module : oar
+# Source : template('oar/repos/debian/oar.list.erb')
 
-<% case operatingsystem -%>
-<% when "Debian" -%>
-<% if lsbdistcodename != 'wheezy' -%>
-deb http://oar-ftp.imag.fr/oar/<%= scope.lookupvar('version') %>/debian/ <%= lsbdistcodename %> main
-<% else -%>
-deb http://oar-ftp.imag.fr/oar/<%= scope.lookupvar('version') %>/debian/ wheezy-unstable main
-<% end -%>
-<% when "Ubuntu" -%>
-deb http://oar-ftp.imag.fr/oar/<%= scope.lookupvar('version') %>/debian/ squeeze main
-<% end -%>
+deb http://oar-ftp.imag.fr/oar/<%= scope.lookupvar("oar::major_release") %>/debian/ <%= @debian_distribution %> main
