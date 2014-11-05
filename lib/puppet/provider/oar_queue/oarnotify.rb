@@ -4,10 +4,13 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
 
   optional_commands :oarnotify => "oarnotify"
 
-  oar_version = File.read('/usr/share/perl5/OAR/Version.pm').scan(/\d+\.\d+\.\d+/).first
   $oarnotify_options = {}
-  $oarnotify_options[:add] = Gem::Version.new(oar_version) > Gem::Version.new('2.5.3') ? '--add-queue' : '--add_queue'
-  $oarnotify_options[:remove] = Gem::Version.new(oar_version) > Gem::Version.new('2.5.3') ? '--remove-queue' : '--remove_queue'
+
+  def checkOARVersion
+    $oar_version ||= File.read('/usr/share/perl5/OAR/Version.pm').scan(/\d+\.\d+\.\d+/).first
+    $oarnotify_options[:add] = Gem::Version.new($oar_version) > Gem::Version.new('2.5.3') ? '--add-queue' : '--add_queue'
+    $oarnotify_options[:remove] = Gem::Version.new($oar_version) > Gem::Version.new('2.5.3') ? '--remove-queue' : '--remove_queue'
+  end
 
   def queues
 
@@ -30,6 +33,7 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
   end
 
   def add
+    checkOARVersion
     oarnotify($oarnotify_options[:add], "#{resource[:name]},#{resource[:priority]},#{resource[:scheduler]}")
     state = queues.select { |queue| queue[:name] == resource[:name] }.first[:state]
     if resource[:enabled] == :false
@@ -38,6 +42,7 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
   end
 
   def remove
+    checkOARVersion
     oarnotify($oarnotify_options[:remove], resource[:name])
   end
 
@@ -50,6 +55,7 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
   end
 
   def priority=(value)
+    checkOARVersion
     oarnotify($oarnotify_options[:remove], resource[:name])
     oarnotify($oarnotify_options[:add], "#{resource[:name]},#{resource[:priority]},#{resource[:scheduler]}")
   end
@@ -59,6 +65,7 @@ Puppet::Type.type(:oar_queue).provide(:oarnotify) do
   end
 
   def scheduler=(value)
+    checkOARVersion
     oarnotify($oarnotify_options[:remove], resource[:name])
     oarnotify($oarnotify_options[:add], "#{resource[:name]},#{resource[:priority]},#{resource[:scheduler]}")
   end
