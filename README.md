@@ -61,63 +61,67 @@ class {
 
 ### oar_queue
 
-    oar_queue {
-      "testing":
-        ensure    => present,
-        priority  => 1,
-        scheduler => "oar_sched_gantt_with_timesharing",
-        enabled   => true;
-    }
-
+```Puppet
+oar_queue {
+  "testing":
+    ensure    => present,
+    priority  => 1,
+    scheduler => "oar_sched_gantt_with_timesharing",
+    enabled   => true;
+}
+```
 
 ### oar_property
 
-    oar_property {
-      "duration_weight":
-        ensure  => present;
-      ["room", "maintenance", "infiniband"]:
-        ensure  => present,
-        varchar => true;
-    }
-
+```Puppet
+oar_property {
+  "duration_weight":
+    ensure  => present;
+  ["room", "maintenance", "infiniband"]:
+    ensure  => present,
+    varchar => true;
+}
+```
 
 ### oar_admission_rule
 
 Manage OAR admission rule from puppet manifests. Only MySQL provider is available (PgSQL will be available).
 
-    Oar_admission_rule {
-      db_name     => "oar2",
-      db_hostname => "localhost",
-      db_user     => "oar",
-      db_password => "xxxx",
-      provider    => mysql
-    }
-    
-    oar_admission_rule {
-      "Dedicated interactive queue":
-        content => template("igrida/oar/admission_rules/dedicated_interactive.pl");
-      "Limit number of jobs":
-        content => template("igrida/oar/admission_rules/limit_number_of_jobs.pl");
-      "Maintenance in progress":
-        ensure  => absent,
-        content => '
-    # Description : Rules to block submission during a maintenance
-    
-    if ($queue_name ne "admin") {
-      die("[ADMISSION_RULES] Maintenance in progress");
-    }
-    ';
-    }
+```Puppet
+Oar_admission_rule {
+  db_name     => "oar2",
+  db_hostname => "localhost",
+  db_user     => "oar",
+  db_password => "xxxx",
+  provider    => mysql
+}
 
+oar_admission_rule {
+  "Dedicated interactive queue":
+    content => template("igrida/oar/admission_rules/dedicated_interactive.pl");
+  "Limit number of jobs":
+    content => template("igrida/oar/admission_rules/limit_number_of_jobs.pl");
+  "Maintenance in progress":
+    ensure  => absent,
+    content => '
+# Description : Rules to block submission during a maintenance
+
+if ($queue_name ne "admin") {
+  die("[ADMISSION_RULES] Maintenance in progress");
+}
+';
+}
+```
 
 ## Librarian-puppet setup
 
 Edit your `Puppetfile` :
 
-    mod 'oar',
-      :git => 'git://github.com/pmorillon/puppet-oar.git',
-      :ref => '0.0.4'
-
+```Ruby
+mod 'oar',
+  :git => 'git://github.com/pmorillon/puppet-oar.git',
+  :ref => '0.0.4'
+```
 
 ## Testing with vagrant
 
