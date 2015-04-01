@@ -2,6 +2,8 @@ Puppet::Type.type(:oar_admission_rule).provide(:pgsql) do
 
   desc "Manage PostgreSQL databases."
 
+  defaultfor :oar_admission_rule => :pgsql
+
   has_command(:psql, "/usr/bin/psql") do
 #    environment :PGPASSWORD => resource[:db_password]
   end
